@@ -1,0 +1,49 @@
+USE library_database;
+
+CREATE OR REPLACE VIEW titles_per_author AS
+SELECT CONCAT(first_name, ' ', last_name) AS "Author Name", COUNT(book_title) AS "# of Titles"
+FROM book b
+	JOIN author a ON b.author_id = a.author_id
+GROUP BY CONCAT(first_name, ' ', last_name)
+ORDER BY COUNT(book_title) DESC;
+
+CREATE OR REPLACE VIEW restrictions AS
+SELECT book_title, CONCAT(first_name, ' ', last_name) AS "Author Name", restriction_id  
+FROM book b 
+	JOIN author a ON b.author_id = a.author_id
+WHERE restriction_id IN (SELECT restriction_id FROM restriction WHERE restriction_id != 1)
+ORDER BY book_title;
+
+CREATE OR REPLACE VIEW books_per_publisher AS
+SELECT house_name as "Publisher Name", count(b.publishing_id) as "# of Books in database"
+FROM book b
+	JOIN publishing p ON b.publishing_id = p.publishing_id
+GROUP BY  house_name
+ORDER BY count(b.publishing_id) desc;
+
+CREATE OR REPLACE VIEW english_written_books AS
+SELECT book_title as "Book Title", `language` as "Language"
+FROM book
+WHERE `language` = "English"
+ORDER BY book_title;
+
+CREATE OR REPLACE VIEW count_french_books AS 
+SELECT CONCAT(first_name, ' ', last_name) AS "Author Name", COUNT(b.language) AS "# of French Books in database"
+FROM book b
+	JOIN author a ON b.author_id = a.author_id
+WHERE `language` = "French"
+GROUP BY CONCAT(first_name, ' ', last_name)
+ORDER BY COUNT(book_title) DESC;
+
+CREATE OR REPLACE VIEW books_and_genres AS
+SELECT b.book_title AS "Book Title", g.genre_name AS "Genre Name"
+FROM book b
+	INNER JOIN has_genre hg ON hg.isbn_13 = b.isbn_13
+	INNER JOIN genre g ON hg.genre_id = g.genre_id
+ORDER BY b.book_title;
+
+CREATE OR REPLACE VIEW count_Hilton_2001 AS
+SELECT CONCAT (first_name, " ", last_name) AS "Author Name"
+	FROM author
+		JOIN book ON date_published = "2001"
+WHERE last_name = "Hilton";
